@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { PostService } from '../../services/post.service';
+import { ZoneService } from '../../services/zone.service';
+import { PetitPostService } from '../../services/petitpost.service';
 import { Post } from '../../models/post';
+import { Zone } from '../../models/zone';
+import { PetitPost } from '../../models/petit-post';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { PetitPost } from '../../models/petit-post';
-import { Zone } from '../../models/zone';
 
 @Component({
   selector: 'app-post-list',
@@ -16,12 +18,16 @@ import { Zone } from '../../models/zone';
 })
 export class PostListComponent implements OnInit {
   posts: Post[] = [];
+  errorMessage: string | null = null;
 
-  constructor(private postService: PostService) { }
+  constructor(
+    private postService: PostService,
+    private zoneService: ZoneService,
+    private petitPostService: PetitPostService
+  ) { }
 
   ngOnInit(): void {
     this.postService.getPosts().subscribe(data => {
-      // Initialiser editingName pour chaque post, zone et petit post
       this.posts = data.map(post => ({
         ...post,
         editingName: false,
@@ -34,12 +40,32 @@ export class PostListComponent implements OnInit {
           }))
         }))
       }));
+    }, error => {
+      this.errorMessage = error.message;
     });
   }
 
   editPost(post: Post): void {
     this.postService.updatePost(post.id, post).subscribe(() => {
       post.editingName = false;
+    }, error => {
+      this.errorMessage = error.message;
+    });
+  }
+
+  editZone(post: Post, zone: Zone): void {
+    this.zoneService.updateZone(zone.postId, zone).subscribe(() => {
+      zone.editingName = false;
+    }, error => {
+      this.errorMessage = error.message;
+    });
+  }
+
+  editPetitPost(post: Post, zone: Zone, petitPost: PetitPost): void {
+    this.petitPostService.updatePetitPost(petitPost.zoneId, petitPost).subscribe(() => {
+      petitPost.editingName = false;
+    }, error => {
+      this.errorMessage = error.message;
     });
   }
 
@@ -47,46 +73,50 @@ export class PostListComponent implements OnInit {
     if (post.id) {
       this.postService.deletePost(post.id).subscribe(() => {
         this.posts = this.posts.filter(p => p !== post);
+      }, error => {
+        this.errorMessage = error.message;
+      });
+    }
+  }
+
+  
+  deleteZone(post: Post, zone: Zone): void {
+    if (zone.id) {
+      this.zoneService.deleteZone(zone.id).subscribe(() => {
+        post.zones = post.zones.filter(z => z !== zone);
+      }, error => {
+        this.errorMessage = error.message;
+      });
+    }
+  }
+
+  deletePetitPost(zone: Zone, petitPost: PetitPost, post: Post): void {
+    if (petitPost.id) {
+      this.petitPostService.deletePetitPost(petitPost.id).subscribe(() => {
+        zone.petitPosts = zone.petitPosts.filter(pp => pp !== petitPost);
+      }, error => {
+        this.errorMessage = error.message;
       });
     }
   }
 
   addZone(post: Post): void {
     post.zones.push({
-      name: '', petitPosts: [], editingName: false,
       id: 0,
-      postId: undefined
+      name: '',
+      postId: post.id,
+      editingName: false,
+      petitPosts: []
     });
   }
 
   addPetitPost(zone: Zone): void {
     zone.petitPosts.push({
-      name: '', editingName: false,
       id: 0,
-      postId: undefined,
-      zoneId: undefined
+      name: '',
+      zoneId: zone.id,
+      editingName: false,
+      postId: undefined
     });
-  }
-
-  editZone(post: Post, zone: Zone): void {
-    this.postService.updateZone(post.id, zone).subscribe(() => {
-      zone.editingName = false;
-    });
-  }
-
-  deleteZone(post: Post, zone: Zone): void {
-    post.zones = post.zones.filter(z => z !== zone);
-    this.editPost(post);
-  }
-
-  editPetitPost(post: Post, zone: Zone, petitPost: PetitPost): void {
-    this.postService.updatePetitPost(post.id, zone.id, petitPost).subscribe(() => {
-      petitPost.editingName = false;
-    });
-  }
-
-  deletePetitPost(zone: Zone, petitPost: PetitPost, post: Post): void {
-    zone.petitPosts = zone.petitPosts.filter(pp => pp !== petitPost);
-    this.editPost(post);
   }
 }

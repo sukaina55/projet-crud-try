@@ -1,51 +1,54 @@
 <div class="container mt-4">
+    <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+  
     <div *ngIf="posts && posts.length">
-        <div *ngFor="let post of posts" class="card mb-3">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h2>
-                    <span *ngIf="!post.editingName">{{ post.name }}</span>
-                    <input *ngIf="post.editingName" class="form-control" type="text" [(ngModel)]="post.name">
-                </h2>
-                <div>
-                    <button *ngIf="!post.editingName" class="btn btn-outline-primary" (click)="post.editingName = true">Éditer</button>
-                    <button *ngIf="post.editingName" class="btn btn-outline-success" (click)="editPost(post)">Enregistrer</button>
-                    <button class="btn btn-outline-danger" (click)="deletePost(post)">Supprimer</button>
-                </div>
-            </div>
-            <div class="card-body">
-                <div *ngFor="let zone of post.zones" class="mb-3">
-                    <h3>
-                        <span *ngIf="!zone.editingName">{{ zone.name }}</span>
-                        <input *ngIf="zone.editingName" class="form-control" type="text" [(ngModel)]="zone.name">
-                    </h3>
-                    <div class="d-flex justify-content-end mb-2">
-                        <button *ngIf="!zone.editingName" class="btn btn-outline-primary me-2" (click)="zone.editingName = true">Éditer</button>
-                        <button *ngIf="zone.editingName" class="btn btn-outline-success me-2" (click)="editZone(post, zone)">Enregistrer</button>
-                        <button class="btn btn-outline-danger" (click)="deleteZone(post, zone)">Supprimer</button>
-                    </div>
-                    <ul class="list-group">
-                        <li class="list-group-item" *ngFor="let petitPost of zone.petitPosts">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span *ngIf="!petitPost.editingName">{{ petitPost.name }}</span>
-                                <input *ngIf="petitPost.editingName" class="form-control" type="text" [(ngModel)]="petitPost.name">
-                                <div>
-                                    <button *ngIf="!petitPost.editingName" class="btn btn-outline-primary me-2" (click)="petitPost.editingName = true">Éditer</button>
-                                    <button *ngIf="petitPost.editingName" class="btn btn-outline-success me-2" (click)="editPetitPost(post, zone, petitPost)">Enregistrer</button>
-                                    <button class="btn btn-outline-danger" (click)="deletePetitPost(zone, petitPost, post)">Supprimer</button>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="list-group-item" *ngIf="zone.petitPosts.length === 0">
-                            Aucun petit post disponible.
-                        </li>
-                    </ul>
-                    <button type="button" class="btn btn-outline-secondary mt-2" (click)="addPetitPost(zone)">Ajouter Petit Post</button>
-                </div>
-                <button type="button" class="btn btn-outline-secondary mt-2" (click)="addZone(post)">Ajouter Zone</button>
-            </div>
+      <div *ngFor="let post of posts" class="card mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h2>
+            <span *ngIf="!post.editingName">{{ post.name }}</span>
+            <input *ngIf="post.editingName" class="form-control" type="text" [(ngModel)]="post.name">
+          </h2>
+          <div>
+            <button *ngIf="!post.editingName" class="btn btn-outline-primary" (click)="post.editingName = true">Éditer</button>
+            <button *ngIf="post.editingName" class="btn btn-outline-success" (click)="editPost(post)">Enregistrer</button>
+            <button class="btn btn-outline-danger" (click)="deletePost(post)">Supprimer</button>
+          </div>
         </div>
+        <div class="card-body">
+          <div *ngFor="let zone of post.zones" class="mb-3">
+            <h3>
+              <span *ngIf="!zone.editingName">{{ zone.name }}</span>
+              <input *ngIf="zone.editingName" class="form-control" type="text" [(ngModel)]="zone.name">
+            </h3>
+            <div class="d-flex justify-content-end mb-2">
+              <button *ngIf="!zone.editingName" class="btn btn-outline-primary me-2" (click)="zone.editingName = true">Éditer</button>
+              <button *ngIf="zone.editingName" class="btn btn-outline-success me-2" (click)="editZone(post, zone)">Enregistrer</button>
+              <button class="btn btn-outline-danger" (click)="deleteZone(post, zone)">Supprimer</button>
+            </div>
+            <ul class="list-group">
+              <li class="list-group-item" *ngFor="let petitPost of zone.petitPosts">
+                <div class="d-flex justify-content-between align-items-center">
+                  <span *ngIf="!petitPost.editingName">{{ petitPost.name }}</span>
+                  <input *ngIf="petitPost.editingName" class="form-control" type="text" [(ngModel)]="petitPost.name">
+                  <div>
+                    <button *ngIf="!petitPost.editingName" class="btn btn-outline-primary me-2" (click)="petitPost.editingName = true">Éditer</button>
+                    <button *ngIf="petitPost.editingName" class="btn btn-outline-success me-2" (click)="editPetitPost(post, zone, petitPost)">Enregistrer</button>
+                    <button class="btn btn-outline-danger" (click)="deletePetitPost(zone, petitPost, post)">Supprimer</button>
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item" *ngIf="zone.petitPosts.length === 0">
+                Aucun petit post disponible.
+              </li>
+            </ul>
+            <button type="button" class="btn btn-outline-secondary mt-2" (click)="addPetitPost(zone)">Ajouter Petit Post</button>
+          </div>
+          <button type="button" class="btn btn-outline-secondary mt-2" (click)="addZone(post)">Ajouter Zone</button>
+        </div>
+      </div>
     </div>
     <div *ngIf="posts.length === 0" class="alert alert-info">
-        Aucun post disponible.
+      Aucun post disponible.
     </div>
-</div>
+  </div>
+  
