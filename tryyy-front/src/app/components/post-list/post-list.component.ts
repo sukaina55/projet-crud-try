@@ -19,11 +19,14 @@ import { FormsModule } from '@angular/forms';
 export class PostListComponent implements OnInit {
   posts: Post[] = [];
   errorMessage: string | null = null;
+  successMessage: string | null = null;
+  deleteMessage: string | null = null;
 
   newZoneName: string = '';
   newPetitPostName: string = '';
   addingZonePost: Post | null = null;
   addingPetitPostZone: Zone | null = null;
+
 
   constructor(
     private postService: PostService,
@@ -50,10 +53,11 @@ export class PostListComponent implements OnInit {
     });
   }
 
-
   editPost(post: Post): void {
     this.postService.updatePost(post.id, post).subscribe(() => {
       post.editingName = false;
+      this.successMessage = "Post modifié avec succès.";
+      this.clearMessages();
     }, error => {
       this.errorMessage = error.message;
     });
@@ -62,6 +66,8 @@ export class PostListComponent implements OnInit {
   editZone(post: Post, zone: Zone): void {
     this.zoneService.updateZone(zone.postId, zone).subscribe(() => {
       zone.editingName = false;
+      this.successMessage = "Zone modifiée avec succès.";
+      this.clearMessages();
     }, error => {
       this.errorMessage = error.message;
     });
@@ -70,27 +76,31 @@ export class PostListComponent implements OnInit {
   editPetitPost(post: Post, zone: Zone, petitPost: PetitPost): void {
     this.petitPostService.updatePetitPost(zone.id, petitPost.id, petitPost).subscribe(() => {
       petitPost.editingName = false;
+      this.successMessage = "Petit post modifié avec succès.";
+      this.clearMessages();
     }, error => {
       this.errorMessage = error.message;
     });
   }
-  
 
   deletePost(post: Post): void {
     if (post.id) {
       this.postService.deletePost(post.id).subscribe(() => {
         this.posts = this.posts.filter(p => p !== post);
+        this.deleteMessage = "Post supprimé avec succès.";
+        this.clearMessages();
       }, error => {
         this.errorMessage = error.message;
       });
     }
   }
 
-  
   deleteZone(post: Post, zone: Zone): void {
     if (zone.id) {
       this.zoneService.deleteZone(zone.id).subscribe(() => {
         post.zones = post.zones.filter(z => z !== zone);
+        this.deleteMessage = "Zone supprimée avec succès.";
+        this.clearMessages();
       }, error => {
         this.errorMessage = error.message;
       });
@@ -101,26 +111,35 @@ export class PostListComponent implements OnInit {
     if (petitPost.id) {
       this.petitPostService.deletePetitPost(petitPost.id).subscribe(() => {
         zone.petitPosts = zone.petitPosts.filter(pp => pp !== petitPost);
+        this.deleteMessage = "Petit post supprimé avec succès.";
+        this.clearMessages();
       }, error => {
         this.errorMessage = error.message;
       });
     }
   }
+
   startAddZone(post: Post): void {
     this.addingZonePost = post;
     this.newZoneName = '';
   }
 
   createZone(post: Post): void {
+    if (!this.newZoneName.trim()) {
+      return; // Arrête la création si le nom de la zone est vide ou ne contient que des espaces
+    }
+
     const newZone: Zone = { name: this.newZoneName, postId: post.id } as Zone;
     this.zoneService.createZone(post.id, newZone).subscribe((zone: Zone) => {
-        post.zones.push({ ...zone, petitPosts: [], editingName: false });
-        this.newZoneName = '';
-        this.addingZonePost = null;
+      post.zones.push({ ...zone, petitPosts: [], editingName: false });
+      this.newZoneName = '';
+      this.addingZonePost = null;
+      this.successMessage = "Zone ajoutée avec succès.";
+      this.clearMessages();
     }, (error: any) => {
-        this.errorMessage = error.message;
+      this.errorMessage = error.message;
     });
-}
+  }
 
   cancelAddZone(): void {
     this.addingZonePost = null;
@@ -133,11 +152,17 @@ export class PostListComponent implements OnInit {
   }
 
   createPetitPost(zone: Zone): void {
+    if (!this.newPetitPostName.trim()) {
+      return; // Arrête la création si le nom du petit post est vide ou ne contient que des espaces
+    }
+
     const newPetitPost: PetitPost = { name: this.newPetitPostName } as PetitPost;
     this.petitPostService.createPetitPost(zone.id, newPetitPost).subscribe((petitPost: PetitPost) => {
       zone.petitPosts.push({ ...petitPost, editingName: false });
       this.newPetitPostName = '';
       this.addingPetitPostZone = null;
+      this.successMessage = "Petit post ajouté avec succès.";
+      this.clearMessages();
     }, (error: any) => {
       this.errorMessage = error.message;
     });
@@ -148,4 +173,11 @@ export class PostListComponent implements OnInit {
     this.newPetitPostName = '';
   }
 
+  private clearMessages(): void {
+    setTimeout(() => {
+      this.successMessage = null;
+      this.deleteMessage = null;
+    }, 3000);
+  }
+  
 }

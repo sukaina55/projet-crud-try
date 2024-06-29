@@ -17,17 +17,24 @@ import { FormsModule } from '@angular/forms';
 })
 export class PostAddComponent {
   newPost: Post;
+  formSubmitted: boolean = false;
+  successMessage: string | null = null;
 
   constructor(private postService: PostService) {
     this.newPost = new Post();
   }
 
   addPost() {
+    this.formSubmitted = true; // Marque le formulaire comme soumis
+    if (!this.isFormValid()) {
+      return; // Arrête la soumission si le formulaire n'est pas valide
+    }
+
     this.postService.createPost(this.newPost).subscribe(
       (createdPost: Post) => {
         console.log('Post créé avec succès:', createdPost);
-        // Réinitialise le formulaire ou effectue d'autres actions nécessaires
-        this.newPost = new Post();
+        this.successMessage = "Le post a été créé avec succès."; // Définit le message de succès
+        this.resetForm(); // Réinitialise le formulaire après une soumission réussie
       },
       (error) => {
         console.error('Erreur lors de la création du post:', error);
@@ -43,5 +50,23 @@ export class PostAddComponent {
   addPetitPost(zone: Zone) {
     const newPetitPost = new PetitPost();
     zone.petitPosts.push(newPetitPost);
+  }
+
+  private isFormValid(): boolean {
+    // Vérifie si tous les champs requis sont remplis
+    return !!this.newPost.name &&
+      this.newPost.zones.every(zone =>
+        !!zone.name &&
+        zone.petitPosts.every(petitPost => !!petitPost.name)
+      );
+  }
+
+  private resetForm() {
+    this.newPost = new Post();
+    this.formSubmitted = false;
+    // Supprime le message de succès après un certain temps
+    setTimeout(() => {
+      this.successMessage = null;
+    }, 3000); // Le message disparaîtra après 3 secondes
   }
 }

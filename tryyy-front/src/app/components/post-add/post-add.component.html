@@ -1,24 +1,28 @@
-<form (ngSubmit)="addPost()" class="my-4">
+<div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+
+<form (ngSubmit)="addPost()" class="my-4" style="background-color: #f8f9fa; padding: 20px; border-radius: 10px;">
+  <div class="form-group">
+    <label for="postName">Nom du Post:</label>
+    <input type="text" class="form-control" id="postName" [(ngModel)]="newPost.name" name="postName" required>
+    <div class="invalid-feedback" *ngIf="formSubmitted && !newPost.name">Le nom du post est requis.</div>
+  </div>
+
+  <div *ngFor="let zone of newPost.zones; let i=index" class="border p-3 mb-3" style="background-color: #ffffff; border: 1px solid #cccccc;">
     <div class="form-group">
-      <label for="postName">Nom du Post:</label>
-      <input type="text" class="form-control" id="postName" [(ngModel)]="newPost.name" name="postName" required>
+      <label for="zoneName{{i}}">Nom de la Zone:</label>
+      <input type="text" class="form-control" id="zoneName{{i}}" [(ngModel)]="zone.name" name="zoneName{{i}}" required>
+      <div class="invalid-feedback" *ngIf="formSubmitted && !zone.name">Le nom de la zone est requis.</div>
     </div>
-  
-    <div *ngFor="let zone of newPost.zones; let i=index" class="border p-3 mb-3">
-      <div class="form-group">
-        <label for="zoneName{{i}}">Nom de la Zone:</label>
-        <input type="text" class="form-control" id="zoneName{{i}}" [(ngModel)]="zone.name" name="zoneName{{i}}" required>
-      </div>
-  
-      <div *ngFor="let petitPost of zone.petitPosts; let j=index" class="form-group">
-        <label for="petitPostName{{i}}{{j}}">Nom du Petit Post:</label>
-        <input type="text" class="form-control" id="petitPostName{{i}}{{j}}" [(ngModel)]="petitPost.name" name="petitPostName{{i}}{{j}}" required>
-      </div>
-  
-      <button type="button" class="btn btn-outline-primary mb-2" (click)="addPetitPost(zone)">Ajouter Petit Post</button>
+
+    <div *ngFor="let petitPost of zone.petitPosts; let j=index" class="form-group">
+      <label for="petitPostName{{i}}{{j}}">Nom du Petit Post:</label>
+      <input type="text" class="form-control" id="petitPostName{{i}}{{j}}" [(ngModel)]="petitPost.name" name="petitPostName{{i}}{{j}}" required>
+      <div class="invalid-feedback" *ngIf="formSubmitted && !petitPost.name">Le nom du petit post est requis.</div>
     </div>
-  
-    <button type="button" class="btn btn-outline-success mr-2" (click)="addZone()">Ajouter Zone</button>
-    <button type="submit" class="btn btn-primary">Enregistrer Post</button>
-  </form>
-  
+
+    <button type="button" class="btn btn-outline-secondary mb-2" (click)="addPetitPost(zone)">Ajouter Petit Post</button>
+  </div>
+
+  <button type="button" class="btn btn-outline-secondary mr-2" (click)="addZone()">Ajouter Zone</button>
+  <button type="submit" class="btn btn-danger">Enregistrer Post</button>
+</form>
