@@ -41,9 +41,23 @@
                 Aucun petit post disponible.
               </li>
             </ul>
-            <button type="button" class="btn btn-outline-secondary mt-2" (click)="addPetitPost(zone)">Ajouter Petit Post</button>
+            <button type="button" class="btn btn-outline-secondary mt-2" (click)="startAddPetitPost(zone)">Ajouter Petit Post</button>
+
+            <!-- Formulaire pour ajouter un PetitPost -->
+            <div *ngIf="zone === addingPetitPostZone">
+              <input type="text" [(ngModel)]="newPetitPostName" class="form-control mt-2" placeholder="Nom du petit post">
+              <button class="btn btn-primary mt-2" (click)="createPetitPost(zone)">Ajouter Petit Post</button>
+              <button class="btn btn-secondary mt-2" (click)="cancelAddPetitPost()">Annuler</button>
+            </div>
           </div>
-          <button type="button" class="btn btn-outline-secondary mt-2" (click)="addZone(post)">Ajouter Zone</button>
+          <button type="button" class="btn btn-outline-secondary mt-2" (click)="startAddZone(post)">Ajouter Zone</button>
+  
+          <!-- Formulaire pour ajouter une Zone -->
+          <div *ngIf="post === addingZonePost">
+            <input type="text" [(ngModel)]="newZoneName" class="form-control mt-2" placeholder="Nom de la zone">
+            <button class="btn btn-primary mt-2" (click)="createZone(post)">Ajouter Zone</button>
+            <button class="btn btn-secondary mt-2" (click)="cancelAddZone()">Annuler</button>
+          </div>
         </div>
       </div>
     </div>

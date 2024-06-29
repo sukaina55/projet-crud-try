@@ -6,6 +6,7 @@ export class Post {
     zones: Zone[] = [];
    
   editingName?: boolean; // Ajout de la propriété editingName
+addingZone: any;
   
     constructor() {
       this.zones = [];

@@ -20,6 +20,11 @@ export class PostListComponent implements OnInit {
   posts: Post[] = [];
   errorMessage: string | null = null;
 
+  newZoneName: string = '';
+  newPetitPostName: string = '';
+  addingZonePost: Post | null = null;
+  addingPetitPostZone: Zone | null = null;
+
   constructor(
     private postService: PostService,
     private zoneService: ZoneService,
@@ -45,6 +50,7 @@ export class PostListComponent implements OnInit {
     });
   }
 
+
   editPost(post: Post): void {
     this.postService.updatePost(post.id, post).subscribe(() => {
       post.editingName = false;
@@ -62,12 +68,13 @@ export class PostListComponent implements OnInit {
   }
 
   editPetitPost(post: Post, zone: Zone, petitPost: PetitPost): void {
-    this.petitPostService.updatePetitPost(petitPost.zoneId, petitPost).subscribe(() => {
+    this.petitPostService.updatePetitPost(zone.id, petitPost.id, petitPost).subscribe(() => {
       petitPost.editingName = false;
     }, error => {
       this.errorMessage = error.message;
     });
   }
+  
 
   deletePost(post: Post): void {
     if (post.id) {
@@ -99,24 +106,46 @@ export class PostListComponent implements OnInit {
       });
     }
   }
+  startAddZone(post: Post): void {
+    this.addingZonePost = post;
+    this.newZoneName = '';
+  }
 
-  addZone(post: Post): void {
-    post.zones.push({
-      id: 0,
-      name: '',
-      postId: post.id,
-      editingName: false,
-      petitPosts: []
+  createZone(post: Post): void {
+    const newZone: Zone = { name: this.newZoneName, postId: post.id } as Zone;
+    this.zoneService.createZone(post.id, newZone).subscribe((zone: Zone) => {
+        post.zones.push({ ...zone, petitPosts: [], editingName: false });
+        this.newZoneName = '';
+        this.addingZonePost = null;
+    }, (error: any) => {
+        this.errorMessage = error.message;
+    });
+}
+
+  cancelAddZone(): void {
+    this.addingZonePost = null;
+    this.newZoneName = '';
+  }
+
+  startAddPetitPost(zone: Zone): void {
+    this.addingPetitPostZone = zone;
+    this.newPetitPostName = '';
+  }
+
+  createPetitPost(zone: Zone): void {
+    const newPetitPost: PetitPost = { name: this.newPetitPostName } as PetitPost;
+    this.petitPostService.createPetitPost(zone.id, newPetitPost).subscribe((petitPost: PetitPost) => {
+      zone.petitPosts.push({ ...petitPost, editingName: false });
+      this.newPetitPostName = '';
+      this.addingPetitPostZone = null;
+    }, (error: any) => {
+      this.errorMessage = error.message;
     });
   }
 
-  addPetitPost(zone: Zone): void {
-    zone.petitPosts.push({
-      id: 0,
-      name: '',
-      zoneId: zone.id,
-      editingName: false,
-      postId: undefined
-    });
+  cancelAddPetitPost(): void {
+    this.addingPetitPostZone = null;
+    this.newPetitPostName = '';
   }
+
 }

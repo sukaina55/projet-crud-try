@@ -10,6 +10,7 @@ import { PetitPost } from '../models/petit-post';
   providedIn: 'root'
 })
 export class PostService {
+  [x: string]: any;
   private baseUrl = 'http://localhost:8092/posts';
 
   constructor(private http: HttpClient) {}

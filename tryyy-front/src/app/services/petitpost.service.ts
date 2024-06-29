@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { PetitPost } from '../models/petit-post';
 
 @Injectable({
@@ -12,27 +11,17 @@ export class PetitPostService {
 
   constructor(private http: HttpClient) {}
 
-  updatePetitPost(zoneId: number, petitPost: PetitPost): Observable<PetitPost> {
-    return this.http.put<PetitPost>(`${this.baseUrl}/${petitPost.id}`, petitPost).pipe(
-      catchError(this.handleError)
-    );
+ 
+  createPetitPost(zoneId: number, petitPost: PetitPost): Observable<PetitPost> {
+    return this.http.post<PetitPost>(`${this.baseUrl}/zones/${zoneId}/petit-posts`, petitPost);
   }
-  deletePetitPost(petitPostId: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${petitPostId}`).pipe(
-      catchError(this.handleError)
-    );
+  
+  updatePetitPost(zoneId: number, petitPostId: number, petitPost: PetitPost): Observable<PetitPost> {
+    return this.http.put<PetitPost>(`${this.baseUrl}/zones/${zoneId}/petit-posts/${petitPostId}`, petitPost);
   }
   
 
-  private handleError(error: HttpErrorResponse) {
-    if (error.error instanceof ErrorEvent) {
-      console.error('Une erreur s\'est produite :', error.error.message);
-    } else {
-      console.error(
-        `Code d'erreur ${error.status}, ` +
-        `Erreur : ${error.error}`
-      );
-    }
-    return throwError('Une erreur s\'est produite. Veuillez réessayer plus tard.');
+  deletePetitPost(petitPostId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${petitPostId}`);
   }
 }

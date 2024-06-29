@@ -12,6 +12,10 @@ export class ZoneService {
 
   constructor(private http: HttpClient) {}
 
+  createZone(postId: number, zone: Zone): Observable<Zone> {
+    return this.http.post<Zone>(`${this.baseUrl}/posts/${postId}/zones`, zone);
+  }
+
   updateZone(postId: number, zone: Zone): Observable<Zone> {
     return this.http.put<Zone>(`${this.baseUrl}/${zone.id}`, zone).pipe(
       catchError(this.handleError)
